@@ -29,7 +29,7 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 TEMPLATE_DIRS = (
-    # TODO: ASK how to make this app-based
+    # TODO: find out how to make this relative to each app
     os.path.join(BASE_DIR, 'login/templates/'),
 )
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'auth_project',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,3 +91,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+
+    "/opt/webfiles/common",
+)
+
+# Login & Authentication
+LOGIN_URL = '/login/'
+
+AUTHENTICATION_BACKENDS = (
+    'auth_project.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
+
