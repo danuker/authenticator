@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 
 admin.autodiscover()
@@ -14,5 +13,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', login_views.user_login),
     url(r'^logout/$', login_views.user_logout),
+    url(r'^register/$', login_views.user_register),
+    url(r'^validate/$', login_views.user_validate),
     url(r'^$', login_views.home),
 )

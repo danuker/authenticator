@@ -13,8 +13,8 @@ class EmailUserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
         email = UserManager.normalize_email(email)
-        user = self.model(username=email, email=email,
-                          is_staff=False, is_active=True, is_superuser=False,
+        user = self.model(email=email, is_staff=False,
+                          is_active=True, is_superuser=False,
                           last_login=now, date_joined=now, **extra_fields)
 
         user.set_password(password)
@@ -31,15 +31,15 @@ class EmailUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-
-    email = models.CharField(max_length=70, unique=True, db_index=True)
+    email = models.EmailField(unique=True, db_index=True)
     first_name = models.CharField(max_length=70)
     last_name = models.CharField(max_length=70)
     web_url = models.URLField()
-    is_verified = models.BooleanField()
+    is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 

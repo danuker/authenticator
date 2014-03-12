@@ -1,0 +1,28 @@
+<html>
+<head>
+    {% load staticfiles %}
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <form method="POST" action="." class="form-register">
+        {% csrf_token %}
+        {% if message %}
+        <h2>{{message}}</h2>
+        {% else %}
+        <h1> Welcome to the Authenticator!</h1>
+        {% endif %}
+        <h2 class="form-signin-heading">Register here:</h2>
+
+        <input name="first-name" type="text" class="form-control" placeholder="First name" autofocus required>
+        <input name="last-name" type="text" class="form-control" placeholder="Last name" required>
+        <input name="email" type="email" class="form-control" placeholder="Email address" required>
+        <input name="password" type="password" class="form-control" placeholder="Password" required>
+        <input name="web-url" type="text" class="form-control" placeholder="Web URL">
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+    </form>
+
+</div>
+</body>
+</html>

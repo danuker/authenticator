@@ -4,12 +4,28 @@
         <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
     </head>
     <body>
-    <h1>
-        Hello, {{name}}!
-    </h1>
-    <p>
-        <a href="{% url 'login.views.user_logout' %}">Log out</a>
-    </p>
+    <div class="container">
 
+        {% if message %}
+        <h2>{{message}}</h2>
+        {% endif %}
+
+        <h1>
+            Hello, {{name}}!
+        </h1>
+        {% if not is_verified %}
+        <div class="container bg-warning">
+            <h2>Your email is not verified.</h2>
+
+            <p>To be able to recover your password, please
+                <a href="{% url 'login.views.user_validate' %}">click</a>
+                to send yourself a validation mail.</p>
+        </div>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'login.views.user_logout' %}">Log out</a>
+        </p>
+    </div>
     </body>
 </html>
