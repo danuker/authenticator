@@ -3,19 +3,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
+from models import User
 
 @login_required
 def home(request):
-    return render(request, 'home.html', {'username':request.user.first_name})
+    return render(request, 'home.html', {'name':request.user.get_short_name()})
 
-def logout(request):
+
+def user_logout(request):
     if request.user.is_authenticated():
         auth.logout(request)
     return redirect('/login/')
 
 
 @csrf_protect
-def login(request):
+def user_login(request):
     if request.user.is_authenticated():
         return redirect('/')
 
@@ -32,3 +34,8 @@ def login(request):
         c = {}
         c.update(csrf(request))
         return render(request, 'login.html', c)
+
+
+
+
+

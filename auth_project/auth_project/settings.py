@@ -26,7 +26,6 @@ TEMPLATE_DEBUG = True
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.load_template_source',
 )
 TEMPLATE_DIRS = (
     # TODO: find out how to make this relative to each app
@@ -47,6 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'auth_project',
     'south',
+    'login',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -87,21 +87,19 @@ USE_L10N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-
-    "/opt/webfiles/common",
+    os.path.join(BASE_DIR, "static"),
 )
 
 # Login & Authentication
 LOGIN_URL = '/login/'
 
-AUTHENTICATION_BACKENDS = (
-    'auth_project.backends.EmailOrUsernameModelBackend',
-    'django.contrib.auth.backends.ModelBackend'
-)
+AUTH_USER_MODEL = 'login.User'
+
 

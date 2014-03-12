@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^login/$', login_views.login),
-    url(r'^logout/$', login_views.logout),
+    url(r'^login/$', login_views.user_login),
+    url(r'^logout/$', login_views.user_logout),
     url(r'^$', login_views.home),
 )
