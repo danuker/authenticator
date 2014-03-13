@@ -1,31 +1,65 @@
 <html>
-    <head>
-        {% load staticfiles %}
-        <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-    </head>
-    <body>
-    <div class="container">
+<head>
+    {% load staticfiles %}
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
 
-        {% if message %}
-        <h2>{{message}}</h2>
-        {% endif %}
+    {% if messages %}
+    <ul class="messages ">
+        {% for message in messages %}
+        <li
+        {% if message.tags %} class="bg-{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
-        <h1>
-            Hello, {{name}}!
-        </h1>
-        {% if not is_verified %}
-        <div class="container bg-warning">
-            <h2>Your email is not verified.</h2>
+    <h1>
+        Profile
+    </h1>
 
-            <p>To be able to recover your password, please
-                <a href="{% url 'login.views.user_validate' %}">click</a>
-                to send yourself a validation mail.</p>
-        </div>
-        {% endif %}
+    <h2>
+        Hello, {{user.get_short_name}}!
+    </h2>
+    {% if not user.is_verified %}
+    <div class="container bg-warning">
+        <h2>Your email is not verified.</h2>
 
-        <p>
-            <a href="{% url 'login.views.user_logout' %}">Log out</a>
-        </p>
+        <p>To be able to recover your password, please
+            <a href="{% url 'login.views.user_validate' %}">click</a>
+            to send yourself a validation mail.</p>
     </div>
-    </body>
+    {% endif %}
+
+    <div class="container">
+        <table class="table .table-striped">
+            <tr>
+                <td>User name</td>
+                <td>{{user.get_full_name}}</td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>{{user.email}}
+            </tr>
+            </td>
+            <tr>
+                <td>URL</td>
+                <td><a href="{{user.web_url}}">{{user.web_url|safe}}</a>
+            </tr>
+            </td>
+            <tr>
+                <td>Date joined</td>
+                <td>{{user.date_joined}}
+            </tr>
+            </td>
+        </table>
+
+    </div>
+
+    <p>
+        <a href="{% url 'login.views.user_logout' %}">Log out</a>
+    </p>
+</div>
+</body>
 </html>

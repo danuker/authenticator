@@ -4,15 +4,14 @@ from django.utils import timezone
 
 
 class EmailUserManager(BaseUserManager):
-
     def create_user(self, email, password=None, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
         """
+        email = UserManager.normalize_email(email)
         now = timezone.now()
         if not email:
             raise ValueError('The given email must be set')
-        email = UserManager.normalize_email(email)
         user = self.model(email=email, is_staff=False,
                           is_active=True, is_superuser=False,
                           last_login=now, date_joined=now, **extra_fields)
