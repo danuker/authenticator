@@ -1,0 +1,14 @@
+{% extends 'base_form.html' %}
+
+{% block greeting %}
+Hello, forgetful user!
+{% endblock %}
+
+{% block content %}
+<h2>Confirm</h2>
+<p>Please enter the e-mail whose password you'd like to reset:</p>
+{% endblock %}
+
+{% block form_submit %}
+<input class="btn" type="submit" value="Reset"/>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load staticfiles %}
+    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>{% block greeting %}{% endblock %}</h1>
+
+    {% if messages %}
+    <ul class="messages ">
+        {% for message in messages %}
+        <li
+        {% if message.tags %} class="bg-{{ message.tags }}"{% endif %} > {{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

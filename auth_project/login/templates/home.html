@@ -1,33 +1,16 @@
-<html>
-<head>
-    {% load staticfiles %}
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-<div class="container">
+{% extends 'base.html' %}
 
-    {% if messages %}
-    <ul class="messages ">
-        {% for message in messages %}
-        <li
-        {% if message.tags %} class="bg-{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+{% block greeting %}
+Hello, {{user.get_short_name}}!
+{% endblock %}
 
-    <h1>
-        Profile
-    </h1>
-
-    <h2>
-        Hello, {{user.get_short_name}}!
-    </h2>
-    {% if not user.is_verified %}
-    <div class="container bg-warning">
+{% block content %}
+{% if not user.is_verified %}
+<div class="container bg-warning">
         <h2>Your email is not verified.</h2>
 
         <p>To be able to recover your password, please
-            <a href="{% url 'login.views.user_validate' %}">click</a>
+            <a href="{% url 'user_validate' %}">click</a>
             to send yourself a validation mail.</p>
     </div>
     {% endif %}
@@ -40,26 +23,21 @@
             </tr>
             <tr>
                 <td>Email</td>
-                <td>{{user.email}}
+                <td>{{user.email}}</td>
             </tr>
-            </td>
             <tr>
                 <td>URL</td>
-                <td><a href="{{user.web_url}}">{{user.web_url|safe}}</a>
+                <td><a href="{{user.web_url}}">{{user.web_url|safe}}</a></td>
             </tr>
-            </td>
             <tr>
                 <td>Date joined</td>
-                <td>{{user.date_joined}}
+                <td>{{user.date_joined}}</td>
             </tr>
-            </td>
         </table>
 
     </div>
 
     <p>
-        <a href="{% url 'login.views.user_logout' %}">Log out</a>
+        <a href="{% url 'user_logout' %}">Log out</a>
     </p>
-</div>
-</body>
-</html>
+{% endblock %}

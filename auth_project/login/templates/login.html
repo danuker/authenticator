@@ -1,31 +1,16 @@
-<html>
-<head>
-    {% load staticfiles %}
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-<div class="container">
-    <form method="POST" action="." class="form-signin">
-        {% csrf_token %}
+{% extends 'base_form.html' %}
 
-        <h1> Welcome to the Authenticator!</h1>
+{% block greeting %}Welcome to the Authenticator!{% endblock %}
 
-        {% if messages %}
-        <ul class="messages ">
-            {% for message in messages %}
-            <li
-            {% if message.tags %} class="bg-{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+{% block content %}
+<h2 class="form-signin-heading">Please sign in</h2>
+{% endblock %}
 
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input name="email" type="email" class="form-control" placeholder="Email address" required autofocus>
-        <input name="password" type="password" class="form-control" placeholder="Password" required>
+{% block form_submit %}
+<input class="btn" type="submit" value="Login"/>
+{% endblock %}
 
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    </form>
-    <p>No account? <a href="{% url 'login.views.user_register' %}">Register!</a></p>
-</div>
-</body>
-</html>
+{% block footer %}
+<p>Forgot account? <a href="{% url 'reset_pw_email' %}">Reset password!</a></p>
+<p>No account? <a href="{% url 'user_register' %}">Register!</a></p>
+{% endblock %}

@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = (
     'auth_project',
     'south',
     'login',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -71,6 +73,7 @@ ROOT_URLCONF = 'auth_project.urls'
 
 WSGI_APPLICATION = 'auth_project.wsgi.application'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -99,6 +102,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+# Also for debug_toolbar
 
 STATIC_URL = '/static/'
 

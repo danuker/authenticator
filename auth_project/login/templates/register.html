@@ -1,38 +1,13 @@
-<html>
-<head>
-    {% load staticfiles %}
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-<div class="container">
-    <form method="POST" action="." class="form-register">
-        {% csrf_token %}
+{% extends 'base_form.html' %}
 
-        <h1> Welcome to the Authenticator!</h1>
+{% block greeting %}
+Welcome to the Authenticator!
+{% endblock %}
 
-        {% if messages %}
-        <ul class="messages ">
-            {% for message in messages %}
-            <li
-            {% if message.tags %} class="bg-{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+{% block content %}
+<h2 class="form-signin-heading">Register here:</h2>
+{% endblock %}
 
-        <h2 class="form-signin-heading">Register here:</h2>
-
-        <div class="form-group">
-            <input name="first-name" type="text" class="form-control" placeholder="First name" autofocus required>
-        <input name="last-name" type="text" class="form-control" placeholder="Last name" required>
-        <input name="email" type="email" class="form-control" placeholder="Email address" required>
-        <input name="password" type="password" class="form-control" placeholder="Password" required>
-            <input name="password-2" type="password" class="form-control" placeholder="Password (again)" required>
-            <input name="web-url" type="text" class="form-control" placeholder="Web URL">
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-        </div>
-    </form>
-
-</div>
-</body>
-</html>
+{% block form_submit %}
+<input class="btn" type="submit" value="Register">
+{% endblock %}

@@ -1,31 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% load staticfiles %}
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-<div class="container">
-    <h1>
-        Hello, {{name}}!
-    </h1>
+{% extends 'base_form.html' %}
 
-    <h2>Confirm</h2>
+{% block greeting %}
+Hello, {{form.name}}!
+{% endblock %}
 
-    <p>An e-mail has been sent to your address: {{ email }} <br></p>
+{% block content %}
+<h2>Confirm</h2>
+<p>An e-mail has been sent to your address: {{ form.email }}</p>
+<p>Either click the link in the email, or enter the code below:</p>
+{% endblock %}
 
-    <p>Either click the link in the email, or enter the code below:</p>
-
-    <form method="POST" action=".">
-        {% csrf_token %}
-        <input name="code"
-               type="text"
-               class="form-control"
-               autofocus
-               required
-                >
-        <input type="submit" value="Submit">
-    </form>
-</div>
-</body>
-</html>
+{% block form_submit %}
+<input class="btn" type="submit" value="Submit"/>
+{% endblock %}

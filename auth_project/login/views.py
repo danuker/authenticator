@@ -1,95 +1,124 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import auth
+from django.contrib import auth, messages
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
-from django.contrib import messages
-from django.core.mail import send_mail
+from django.views.generic import View
+from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.edit import FormView
 
-from models import User
-
-
-@login_required
-def home(request):
-    return render(request, 'home.html', {'user': request.user})
+from forms import LoginForm, RegisterForm, ValidateForm, PWResetEmailForm
 
 
-@login_required
-def user_logout(request):
-    auth.logout(request)
-    messages.success(request, "Logged out.")
-    return redirect('/login/')
+class HomeView(View, TemplateResponseMixin):
+    template_name = 'home.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(HomeView, self).dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response({'user': request.user})
 
 
-@csrf_protect
-def user_login(request):
-    if request.user.is_authenticated():
-        messages.error(request, "Already logged in!")
-        return redirect('/')
+class UserLogout(View):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UserLogout, self).dispatch(*args, **kwargs)
 
-    elif request.method == 'GET':
-        return render(request, 'login.html')
-
-    elif request.method == 'POST':
-        user = auth.authenticate(email=request.POST['email'], password=request.POST['password'])
-        if user is not None:
-            auth.login(request, user)
-            messages.success(request, "Successfully logged in!")
-            return redirect('/')
-
-        else:
-            messages.error(request, "The credentials were incorrect.")
-            return redirect('/login/')
-
-
-def user_register(request):
-    if request.user.is_authenticated():
-        messages.warning(request, "You have been logged out to register a new user.")
-        return redirect('/logout/')
-
-    elif request.method == 'GET':
-        # Show the registration form
-        return render(request, 'register.html')
-
-    elif request.method == 'POST':
-        # Check passwords
-        if request.POST['password'] != request.POST['password-2']:
-            messages.error(request, 'Passwords did not match.')
-            return redirect('register.html')
-
-        # Register the user, if valid credentials
-        u = User.objects.create_user(email=request.POST['email'],
-                                     first_name=request.POST['first-name'],
-                                     last_name=request.POST['last-name'],
-                                     web_url=request.POST['web-url'],
-        )
-
-        u.set_password(request.POST['password'])
-        u.save()
+    def get(self, request):
+        auth.logout(request)
+        messages.success(request, "Logged out.")
         return redirect('/login/')
 
 
-@login_required
-def user_validate(request):
-    if request.method == 'GET':
-        code = str(abs(hash(request.user.email)))
-        request.session['code'] = code
-        send_mail('Verify email', 'The code is: ' + str(code), 'no-reply@auth.com',
-                  [request.user.email], fail_silently=False)
-        print 'Code:', code
+class UserLogin(FormView):
+    template_name = 'login.html'
+    form_class = LoginForm
+    redirect_field_name = auth.REDIRECT_FIELD_NAME
+    success_url = '/'
 
-        # TODO: Allow get params directly from email (Special case if they exist)
-        return render(request, 'email_send.html',
-                      {'name': request.user.get_short_name(),
-                       'email': request.user.email
-                      })
-    elif request.method == 'POST':
-        if 'code' in request.session and \
-                        request.POST['code'] == request.session['code']:
-            print 'code is verified'
-            # The user is verified
-            request.user.is_verified = True
-            request.user.save()
-            messages.success(request, "E-mail verified!")
-            return redirect('/')
-        messages.error(request, "Code incorrect!")
-        return redirect('/')
+    @method_decorator(csrf_protect)
+    def dispatch(self, *args, **kwargs):
+        return super(UserLogin, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        form.authenticate_and_login(self.request)
+        return super(UserLogin, self).form_valid(form)
+
+
+class UserRegister(FormView):
+    template_name = 'register.html'
+    form_class = RegisterForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        # create user
+        user = form.save()
+        return super(UserRegister, self).form_valid(form)
+
+
+class UserValidate(FormView):
+    template_name = 'email_send.html'
+    form_class = ValidateForm
+    success_url = '/'
+
+    # @method_decorator(login_required)
+    # def dispatch(self, *args, **kwargs):
+    #     return super(UserLogout, self).dispatch(*args, **kwargs)
+
+    def get_form(self, form_class):
+        """
+        Returns an instance of the form to be used in this view.
+        """
+
+        # Generate a code
+        self.request.session['code'] = str(abs(hash(self.request.user.email)))
+
+        kwargs = self.get_form_kwargs()
+        kwargs.update({'code': self.request.session['code'],
+                       'email': self.request.user.email,
+                       'name': self.request.user.get_short_name()})
+
+        instance = form_class(**kwargs)
+
+        # Send the email
+        instance.send_email()
+
+        return instance
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        self.request.user.is_verified = True
+        self.request.user.save()
+        messages.success(self.request, "Successfully verified email!")
+        return super(UserValidate, self).form_valid(form)
+
+    def form_invalid(self, form):
+        return super(UserValidate, self).form_invalid(form)
+
+
+class PWResetEmail(FormView):
+    """
+    Prompts for the email to reset
+    """
+
+    form_class = PWResetEmailForm
+    template_name = 'pw_reset_email.html'
+    success_url = '/reset_pw_code/'
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+        self.request.user.is_verified = True
+        self.request.user.save()
+        messages.success(self.request, "E-mail sent if user exists.")
+        return super(UserValidate, self).form_valid(form)
+
+
+class PWResetResponse(FormView):
+    """
+    Prompts for the password
+    """
+    pass
