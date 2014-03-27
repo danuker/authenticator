@@ -5,8 +5,8 @@ Hello, {{user.get_short_name}}!
 {% endblock %}
 
 {% block content %}
-{% if not user.is_verified %}
-<div class="container bg-warning">
+    {% if not user.is_verified %}
+    <div class="container bg-warning">
         <h2>Your email is not verified.</h2>
 
         <p>To be able to recover your password, please

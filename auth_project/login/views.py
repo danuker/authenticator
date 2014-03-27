@@ -7,7 +7,12 @@ from django.views.generic import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import FormView
 
-from forms import LoginForm, RegisterForm, ValidateForm, PWResetEmailForm
+from forms import \
+    LoginForm,\
+    RegisterForm,\
+    ValidateForm, \
+    PWResetEmailForm, \
+    PWResetResponseForm
 
 
 class HomeView(View, TemplateResponseMixin):
@@ -90,13 +95,10 @@ class UserValidate(FormView):
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
-        self.request.user.is_verified = True
-        self.request.user.save()
+
+        self.request.user.verify()
         messages.success(self.request, "Successfully verified email!")
         return super(UserValidate, self).form_valid(form)
-
-    def form_invalid(self, form):
-        return super(UserValidate, self).form_invalid(form)
 
 
 class PWResetEmail(FormView):
@@ -106,19 +108,30 @@ class PWResetEmail(FormView):
 
     form_class = PWResetEmailForm
     template_name = 'pw_reset_email.html'
-    success_url = '/reset_pw_code/'
+    success_url = '/reset_pw_response/'
 
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
         # It should return an HttpResponse.
-        self.request.user.is_verified = True
-        self.request.user.save()
-        messages.success(self.request, "E-mail sent if user exists.")
-        return super(UserValidate, self).form_valid(form)
+
+        form.send_email()
+        messages.info(self.request, "E-mail sent if user exists.")
+
+        return super(PWResetEmail, self).form_valid(form)
 
 
 class PWResetResponse(FormView):
     """
-    Prompts for the password
+    Prompts for the code, and the new password
     """
-    pass
+
+    form_class = PWResetResponseForm
+    template_name = 'pw_reset_response.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        # This method is called when valid form data has been POSTed.
+        # It should return an HttpResponse.
+
+        messages.success(self.request, "Password was reset.")
+        return super(PWResetResponse, self).form_valid(form)

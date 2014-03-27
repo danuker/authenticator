@@ -9,36 +9,34 @@ class LoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput())
 
-    def authenticate_and_login(self, request):
-
+    def authenticate(self):
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
-        user = auth.authenticate(username=email, password=password)
+        return auth.authenticate(username=email, password=password)
+
+    def authenticate_and_login(self, request):
+        user = self.authenticate()
         if user is not None:
             auth.login(request, user)
             messages.success(request, "Successfully logged in!")
         else:
             messages.error(request, "The credentials were incorrect.")
-
         return user
 
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
-    password2 = forms.CharField(max_length=100, required=False, widget=forms.PasswordInput(), label=u'Confirm Password')
+    password2 = forms.CharField(widget=forms.PasswordInput(),
+                                label=u'Confirm Password')
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password', 'password2', 'web_url')
+        fields = ('first_name', 'last_name', 'email',
+                  'password', 'password2', 'web_url')
         widgets = {
             'password': forms.PasswordInput(),
             'password2': forms.PasswordInput(),
         }
-
-    # TODO: ARGH!
-    # If you define this, call super too! Else, no unique validation
-    # def clean(self):
-    #     raise forms.ValidationError("Email is not unique!")
 
     def clean_password2(self):
         cleaned_data = self.cleaned_data
@@ -71,7 +69,8 @@ class ValidateForm(forms.Form):
         super(ValidateForm, self).__init__(*args, **kwargs)
 
     def send_email(self):
-        send_mail('Verify email', 'The code is: ' + str(self.code), 'no-reply@auth.com',
+        send_mail('Verify email', 'The code is: ' + str(self.code),
+                  'no-reply@auth.com',
                   [self.email], fail_silently=False)
 
     def clean(self):
@@ -83,5 +82,41 @@ class PWResetEmailForm(forms.Form):
     email_field = forms.EmailField(label='E-mail')
 
     def send_email(self):
-        send_mail('Reset password', 'The code is: ' + str(self.code), 'no-reply@auth.com',
-                  [self.email_field], fail_silently=False)
+        code, email = None, None
+
+        try:
+            user = User.objects.get(email=self.cleaned_data.get('email_field'))
+            user.recover_pass()
+            code, email = user.pw_reset_code, user.email
+        except User.DoesNotExist:
+            pass
+
+        return code, email
+
+
+class PWResetResponseForm(forms.Form):
+
+    code_field = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput(),
+                                label='Confirm Password')
+
+    def clean_password2(self):
+        cleaned_data = self.cleaned_data
+        print cleaned_data
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+        if password != password2:
+            raise forms.ValidationError('Passwords do not match!')
+
+    def clean_code_field(self):
+        try:
+            user = User.objects.get(
+                pw_reset_code=self.cleaned_data.get('code_field')
+            )
+            print user.get_full_name()
+            user.set_password(self.cleaned_data.get('password'))
+            user.pw_reset_code = None
+
+        except User.DoesNotExist:
+            raise forms.ValidationError("The code is not valid.")

@@ -29,7 +29,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 TEMPLATE_DIRS = (
-    # TODO: find out how to make this relative to each app
     os.path.join(BASE_DIR, 'login/templates/'),
 )
 

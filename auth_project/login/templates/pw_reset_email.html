@@ -4,11 +4,17 @@
 Hello, forgetful user!
 {% endblock %}
 
-{% block content %}
+{% block form_header %}
 <h2>Confirm</h2>
 <p>Please enter the e-mail whose password you'd like to reset:</p>
 {% endblock %}
 
 {% block form_submit %}
 <input class="btn" type="submit" value="Reset"/>
+{% endblock %}
+
+{% block form_footer %}
+    <p>If you already received a code, go
+        <a href="{% url 'reset_pw_response' %}">here.</a>
+    </p>
 {% endblock %}

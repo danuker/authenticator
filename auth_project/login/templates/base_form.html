@@ -1,24 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% load staticfiles %}
-    <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-<div class="container">
-    <h1>{% block greeting %}{% endblock %}</h1>
+{% extends 'base.html' %}
 
-    {% if messages %}
-    <ul class="messages ">
-        {% for message in messages %}
-        <li
-        {% if message.tags %} class="bg-{{ message.tags }}"{% endif %} > {{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-
-    {% block content %}{% endblock %}
-
+{% block content %}
+    {% block form_header %}{% endblock %}
     <form method="POST" action=".">
 
         {% csrf_token %}
@@ -27,7 +10,7 @@
         </table>
         {% block form_submit %}{% endblock %}
     </form>
-    {% block footer %}{% endblock %}
-</div>
-</body>
-</html>
+    <br>
+    {% block form_footer %}{% endblock %}
+{% endblock %}
+

@@ -2,7 +2,7 @@
 
 {% block greeting %}Welcome to the Authenticator!{% endblock %}
 
-{% block content %}
+{% block form_header %}
 <h2 class="form-signin-heading">Please sign in</h2>
 {% endblock %}
 
@@ -10,7 +10,7 @@
 <input class="btn" type="submit" value="Login"/>
 {% endblock %}
 
-{% block footer %}
+{% block form_footer %}
 <p>Forgot account? <a href="{% url 'reset_pw_email' %}">Reset password!</a></p>
 <p>No account? <a href="{% url 'user_register' %}">Register!</a></p>
 {% endblock %}
